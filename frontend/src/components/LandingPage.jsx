@@ -1,8 +1,13 @@
 import { Box, Typography } from "@mui/material";
 import RoundedBtn from "./RoundedBtn"; // Assuming it's a custom button component
 import MeetOurChefs from "./MeetOurChefs";
-
+import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
+  const navigate = useNavigate();
+  const handleRoundBtnClick = () => {
+    navigate("/ExploreRecipes");
+  };
+
   return (
     <>
       <Box
@@ -50,7 +55,7 @@ export default function LandingPage() {
           A community for chefs and food lovers.
         </Typography>
 
-        <RoundedBtn text="Explore Recipes" />
+        <RoundedBtn text="Explore Recipes" onClick={handleRoundBtnClick} />
       </Box>
       <MeetOurChefs />
     </>

@@ -1,11 +1,19 @@
 import ChefCard from "./ChefCard";
-import { Box, Typography, Grid, Avatar, Button, Modal, TextField } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Grid,
+  Avatar,
+  Button,
+  Modal,
+  TextField,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import PopupForm from "./PopupForm";
 import { useState } from "react";
-
+import PopupRecipe from "./PopupRecipe";
 
 export default function ChefProfile({
   chefData = {
@@ -14,19 +22,42 @@ export default function ChefProfile({
       "https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg",
   },
 }) {
-  //   const firstName = chefData.name;
+  const [jsonData, setJsonData] = useState({
+    cookingInstructions: [],
+  });
+  const [open1, setOpen1] = useState(false);
+  const clickHandler1 = (data) => {
+    setOpen1(true);
+    setJsonData(data);
+  };
+  const [open2, setOpen2] = useState(false);
+  const clickHandler2 = (data) => {
+    setOpen2(true);
+    setJsonData(data);
+  };
 
-  const [open, setOpen] = useState(false);
-  const handleClose = () => { setOpen(false) }
-
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
 
   const recipes = [
     {
       name: "Sour Dough",
       description:
-        "A rustic, tangy sourdough loaf with a crispy crust and soft interior",
+        "A classic sourdough bread made with a tangy starter and a slow fermentation process, perfect for bread lovers.",
       avatar:
         "https://amybakesbread.com/wp-content/uploads/2020/04/cropped-img_0491-scaled.jpeg",
+      time: "24 hours (including fermentation)",
+      cuisine: "Western",
+      cookingInstructions: [
+        "Mix flour, water, salt, and sourdough starter.",
+        "Knead the dough and let it rest.",
+        "Allow the dough to ferment for 18-24 hours.",
+        "Shape the dough and let it rise for another 2 hours.",
+        "Preheat the oven to 475°F (245°C).",
+        "Bake for 30-40 minutes until the crust is golden.",
+        "Let it cool before slicing.",
+      ],
     },
     {
       name: "Classic Victoria Sponge Cake",
@@ -34,6 +65,17 @@ export default function ChefProfile({
         "A light and fluffy sponge cake filled with strawberry jam and cream",
       avatar:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_xG_eQJCxY9Z0Lw23Sfgp8mYvZbyI15Pr_w&s",
+      time: "1 hour",
+      cuisine: "Western",
+      cookingInstructions: [
+        "Preheat the oven to 350°F (175°C).",
+        "Grease and line two 8-inch round cake pans.",
+        "Cream together butter and sugar until light and fluffy.",
+        "Beat in eggs one at a time, then fold in flour and baking powder.",
+        "Divide the batter evenly between the prepared pans.",
+        "Bake for 20-25 minutes or until a toothpick comes out clean.",
+        "Cool the cakes on a wire rack before filling with jam and cream.",
+      ],
     },
     {
       name: "Traditional Steak and Ale Pie",
@@ -41,50 +83,27 @@ export default function ChefProfile({
         "A hearty British pie with tender steak rich ale gravy and a flaky pastry crust",
       avatar:
         "https://www.krumpli.co.uk/wp-content/uploads/2022/05/Steak-and-Ale-Pie-02-720x720.jpg",
+      time: "3 hours",
+      cuisine: "British",
+      cookingInstructions: [
+        "Season and brown the steak in a hot pan.",
+        "Add onions, carrots, and ale, then simmer until the meat is tender.",
+        "Thicken the gravy with flour or cornstarch.",
+        "Transfer the filling to a pie dish and cover with pastry.",
+        "Brush the pastry with egg wash.",
+        "Bake in a preheated oven at 375°F (190°C) for 30-40 minutes.",
+        "Serve hot with mashed potatoes or vegetables.",
+      ],
     },
   ];
-
-
-
   return (
     <>
-      {/* Header section */}
-      {/* <Modal open={open} onClose={handleClose}>
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 350,
-          bgcolor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-        }}>
-          <Typography variant="h6" mb={2}>Fill the form</Typography>
-          <form >
-            <TextField
-              fullWidth
-              label="Name"
-              name="name"
-              // value={formData.name}
-              // onChange={handleChange}
-              margin="normal"
-            />
-            <TextField
-              fullWidth
-              label="Email"
-              name="email"
-              // value={formData.email}
-              // onChange={handleChange}
-              margin="normal"
-            />
-            <Button variant="contained" type="submit" fullWidth sx={{ mt: 2 }}>Submit</Button>
-          </form>
-        </Box>
-      </Modal> */}
-      <PopupForm open={open} onClose={() => setOpen(false)}/>
-
+      <PopupForm open={open1} onClose={() => setOpen1(false)} />
+      <PopupRecipe
+        open={open2}
+        onClose={() => setOpen2(false)}
+        data={jsonData}
+      />
       <Box
         sx={{
           display: "flex",
@@ -167,7 +186,10 @@ export default function ChefProfile({
         }}
       >
         {/* Add new recipe button */}
-        <Button onClick={() => { setOpen(true) }}
+        <Button
+          onClick={() => {
+            setOpen1(true);
+          }}
           variant="contained"
           sx={{
             display: "flex",
@@ -294,6 +316,16 @@ export default function ChefProfile({
                 description={recipe.description}
                 avatar={recipe.avatar}
                 btnText={"View Recipe"}
+                onClick={() => {
+                  clickHandler2({
+                    name: recipe.name,
+                    description: recipe.description,
+                    time: recipe.time,
+                    cuisine: recipe.cuisine,
+                    cookingInstructions: recipe.cookingInstructions,
+                    avatar: recipe.avatar,
+                  });
+                }}
               />
             </Grid>
           ))}

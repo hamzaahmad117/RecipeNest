@@ -1,15 +1,19 @@
+import ChefCard from "./ChefCard";
 import {
   Box,
   Typography,
+  Grid,
+  Avatar,
+  Button,
+  Modal,
   TextField,
   InputAdornment,
-  Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import ChefCard from "./ChefCard";
 import { useState } from "react";
 import PopupRecipe from "./PopupRecipe";
-export default function RecipePortfolio() {
+
+export default function ExploreRecipes() {
   const [jsonData, setJsonData] = useState({
     cookingInstructions: [],
   });
@@ -74,10 +78,10 @@ export default function RecipePortfolio() {
       ],
     },
   ];
+
   return (
     <>
       <PopupRecipe open={open} onClose={() => setOpen(false)} data={jsonData} />
-
       <Box
         sx={{
           display: "flex",
@@ -99,36 +103,14 @@ export default function RecipePortfolio() {
             px: 2,
           }}
         >
-          Recipe Portfolio
+          All Recipes
         </Typography>
-
-        <Typography
-          variant="subtitle1"
-          sx={{
-            fontFamily: `'Playfair Display', serif`,
-            maxWidth: "600px",
-            letterSpacing: "0.1rem",
-            mx: "auto",
-            px: 2,
-          }}
-        >
-          Emily Carter
-        </Typography>
-      </Box>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          mt: -3,
-          borderWidth: "0",
-        }}
-      >
         <TextField
-          placeholder="Search for a chef..."
+          placeholder="Search for a recipe..."
           variant="outlined"
           sx={{
             width: "60%",
-            // backgroundColor: "white",
+
             borderRadius: 5,
             boxShadow: 1,
             backgroundColor: "grey",

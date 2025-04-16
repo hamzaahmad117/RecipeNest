@@ -13,31 +13,22 @@ export default function NavBar() {
   const handleClick = (btn) => {
     console.log(btn);
     if (btn === "Home") {
-      navigate('/');
-      
+      navigate("/");
     } else if (btn === "Chefs") {
-
-      navigate('/ourchefs');
-
-
+      navigate("/ourchefs");
     } else if (btn === "Recipes") {
-      navigate('/recipes');
-
+      navigate("/ExploreRecipes");
     } else if (btn === "Login") {
-
-      navigate('/login');
-
-      
+      navigate("/login");
     }
-
-  }
+  };
 
   const handleRoundBtnClick = () => {
-    navigate('/Signup')
-  }
+    navigate("/Signup");
+  };
   return (
     // <Box sx={{ flexGrow: 1 }}>
-    <AppBar position="static"  >
+    <AppBar position="static">
       <Toolbar
         sx={{ backgroundColor: "#FBFBFB", justifyContent: "space-between" }}
       >
@@ -81,7 +72,13 @@ export default function NavBar() {
           }}
         >
           {buttons.map((btn) => (
-            <Button key={btn} sx={{ color: "#88304E", textTransform: "none" }} onClick={() => {handleClick(btn)}}>
+            <Button
+              key={btn}
+              sx={{ color: "#88304E", textTransform: "none" }}
+              onClick={() => {
+                handleClick(btn);
+              }}
+            >
               {btn}
             </Button>
           ))}
@@ -89,7 +86,10 @@ export default function NavBar() {
         </Box>
 
         {/* Right Button */}
-        <RoundedBtn text="Join as a Chef" onClick={handleRoundBtnClick}></RoundedBtn>
+        <RoundedBtn
+          text="Join as a Chef"
+          onClick={handleRoundBtnClick}
+        ></RoundedBtn>
       </Toolbar>
     </AppBar>
   );

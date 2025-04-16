@@ -8,7 +8,7 @@ import RecipePortfolio from "./components/RecipePortfolio";
 import Signup from "./components/SignUp";
 import Login from "./components/login";
 import MeetOurChefs from "./components/MeetOurChefs";
-
+import  ExploreRecipes from "./components/ExploreRecipes";
 function App() {
 
 
@@ -26,6 +26,7 @@ function App() {
         <Route path='/Login' element={<Login />}> </Route>
         <Route path='/Profile' element={<Profile />}> </Route>
         <Route path='/ourchefs' element={<MeetOurChefs/>}></Route>
+        <Route path='/ExploreRecipes' element={<ExploreRecipes/>}></Route>
       </Routes>
     </>
 
