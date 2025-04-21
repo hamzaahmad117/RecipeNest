@@ -1,130 +1,120 @@
-import { Box, Typography, Grid } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, Typography, Grid, CircularProgress } from "@mui/material";
 import Bio from "./Bio";
 import ChefCard from "./ChefCard";
 import PopupRecipe from "./PopupRecipe";
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 export default function Profile() {
-  const [jsonData, setJsonData] = useState({
-    cookingInstructions: [],
-  });
+  const [jsonData, setJsonData] = useState({ cookingInstructions: [] });
+  const [loading, setLoading] = useState(true);
+  const [recipes, setRecipes] = useState([]);
+  const [chef, setChef] = useState(null); // 👈 null = not checked yet
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  
+
+  useEffect(() => {
+    const localChef = localStorage.getItem("chef");
+
+    if (!localChef) {
+      // window.location.href = "/login";
+      navigate("/login"); // Redirect to login page if not logged in
+      return;
+    }
+
+    const chefData = JSON.parse(localChef);
+    setChef(chefData);
+
+    const fetchRecipes = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/chefs/${chefData.email}/recipes`);
+        if (!response.ok) throw new Error("Failed to fetch recipes");
+        const data = await response.json();
+        setRecipes(data);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipes();
+  }, [navigate]);
+
   const clickHandler = (data) => {
     setOpen(true);
     setJsonData(data);
   };
 
-  const recipes = [
-    {
-      name: "Sour Dough",
-      description:
-        "A classic sourdough bread made with a tangy starter and a slow fermentation process, perfect for bread lovers.",
-      avatar:
-        "https://amybakesbread.com/wp-content/uploads/2020/04/cropped-img_0491-scaled.jpeg",
-      time: "24 hours (including fermentation)",
-      cuisine: "Western",
-      cookingInstructions: [
-        "Mix flour, water, salt, and sourdough starter.",
-        "Knead the dough and let it rest.",
-        "Allow the dough to ferment for 18-24 hours.",
-        "Shape the dough and let it rise for another 2 hours.",
-        "Preheat the oven to 475°F (245°C).",
-        "Bake for 30-40 minutes until the crust is golden.",
-        "Let it cool before slicing.",
-      ],
-    },
-    {
-      name: "Classic Victoria Sponge Cake",
-      description:
-        "A light and fluffy sponge cake filled with strawberry jam and cream",
-      avatar:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR_xG_eQJCxY9Z0Lw23Sfgp8mYvZbyI15Pr_w&s",
-      time: "1 hour",
-      cuisine: "Western",
-      cookingInstructions: [
-        "Preheat the oven to 350°F (175°C).",
-        "Grease and line two 8-inch round cake pans.",
-        "Cream together butter and sugar until light and fluffy.",
-        "Beat in eggs one at a time, then fold in flour and baking powder.",
-        "Divide the batter evenly between the prepared pans.",
-        "Bake for 20-25 minutes or until a toothpick comes out clean.",
-        "Cool the cakes on a wire rack before filling with jam and cream.",
-      ],
-    },
-    {
-      name: "Traditional Steak and Ale Pie",
-      description:
-        "A hearty British pie with tender steak rich ale gravy and a flaky pastry crust",
-      avatar:
-        "https://www.krumpli.co.uk/wp-content/uploads/2022/05/Steak-and-Ale-Pie-02-720x720.jpg",
-      time: "3 hours",
-      cuisine: "British",
-      cookingInstructions: [
-        "Season and brown the steak in a hot pan.",
-        "Add onions, carrots, and ale, then simmer until the meat is tender.",
-        "Thicken the gravy with flour or cornstarch.",
-        "Transfer the filling to a pie dish and cover with pastry.",
-        "Brush the pastry with egg wash.",
-        "Bake in a preheated oven at 375°F (190°C) for 30-40 minutes.",
-        "Serve hot with mashed potatoes or vegetables.",
-      ],
-    },
-  ];
+  // 🧠 Graceful handling during initial auth check
+  if (!chef) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress color="secondary" />
+      </Box>
+    );
+  }
+
   return (
     <>
       <PopupRecipe open={open} onClose={() => setOpen(false)} data={jsonData} />
       <Bio
-        name="Emily Carter"
-        description="Master of fusion cuisine, blending Latin flavors with modern twists."
-        avatar="https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg"
-        twitter="https://x.com/?lang=en"
+        name={chef.firstName + " " + chef.lastName}
+        description={chef.Description}
+        avatar={chef.avatar}
+        twitter={chef.twitter}
       />
-
       <Box sx={{ display: "flex", justifyContent: "center" }}>
-        <hr
-          style={{
-            width: "50%",
-            color: "black",
-            height: "0.12px",
-            backgroundColor: "black",
-            borderWidth: "0 ",
-          }}
-        ></hr>
+        <hr style={{ width: "50%", height: "0.12px", backgroundColor: "black", borderWidth: "0" }} />
       </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-        }}
-      >
+      <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
         <Typography variant="h4" fontWeight="bold" sx={{ color: "black" }}>
           Featured Recipes
         </Typography>
       </Box>
       <Box sx={{ px: 4, py: 6 }}>
         <Grid container spacing={4} justifyContent="center">
-          {recipes.map((recipe, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <ChefCard
-                name={recipe.name}
-                description={recipe.description}
-                avatar={recipe.avatar}
-                btnText={"View Recipe"}
-                onClick={() => {
-                  clickHandler({
-                    name: recipe.name,
-                    description: recipe.description,
-                    time: recipe.time,
-                    cuisine: recipe.cuisine,
-                    cookingInstructions: recipe.cookingInstructions,
-                    avatar: recipe.avatar,
-                  });
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+              <Box
+                sx={{
+                  border: '6px solid #eee',
+                  borderTop: '6px solid #541212',
+                  borderRadius: '50%',
+                  width: 50,
+                  height: 50,
+                  animation: 'spin 1s linear infinite',
+                  '@keyframes spin': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' },
+                  },
                 }}
               />
-            </Grid>
-          ))}
+            </Box>
+          ) : recipes.length > 0 ? (
+            recipes.map((recipe, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}>
+                <ChefCard
+                  name={recipe.name}
+                  description={recipe.description}
+                  avatar={recipe.avatar}
+                  btnText={"View Recipe"}
+                  onClick={() =>
+                    clickHandler({
+                      name: recipe.name,
+                      description: recipe.description,
+                      time: recipe.time,
+                      cuisine: recipe.cuisine,
+                      cookingInstructions: recipe.cookingInstructions,
+                      avatar: recipe.avatar,
+                    })
+                  }
+                />
+              </Grid>
+            ))
+          ) : (
+            <Typography variant="h6">No recipes found</Typography>
+          )}
         </Grid>
       </Box>
     </>

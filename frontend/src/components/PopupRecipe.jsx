@@ -1,6 +1,6 @@
 // import React, { useState } from 'react';
-import { Modal, Box, Typography, TextField, Button } from "@mui/material";
-import { useState } from "react";
+import { Modal, Box, Typography, Button } from "@mui/material";
+//import { useState } from "react";
 const style = {
   position: "absolute",
   top: "50%",
@@ -17,10 +17,10 @@ const style = {
 };
 
 export default function PopupRecipe(props) {
-  const [open, setOpen] = useState(props.open);
+  //const [open, setOpen] = useState(props.open);
   //   const handleOpen = () => setOpen(true);
   const handleClose = () => {
-    setOpen(false);
+    //setOpen(false);
     // if (props.onClose) {
     props.onClose();
     // }

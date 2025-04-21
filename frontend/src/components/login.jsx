@@ -10,7 +10,55 @@ import {
   Divider,
 } from "@mui/material";
 
+import { useEffect, useState } from "react";
+
 export default function Login() {
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    // Check if user is already logged in (e.g., check local storage or cookies)
+    const loggedInUser = localStorage.getItem("chef");
+    if (loggedInUser) {
+      // Redirect to dashboard or home page
+      window.location.href = "/Profile"; // Change this to your desired route
+    }
+  }, []);
+
+  const loginHandler = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+  
+      const data = await res.json();
+  
+      if (data.success) {
+        // Store user info in localStorage
+        localStorage.setItem("chef", JSON.stringify(data.chef));
+  
+        // Redirect to dashboard
+        window.location.href = "/Profile";
+      } else {
+        alert("Invalid email or password");
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Login error. Try again.");
+    }
+  };
+  
+
+
+
   return (
     <Grid container sx={{ height: "100vh" }}>
       <Grid item xs={12} md={6} sx={{ position: "relative" }}>
@@ -69,6 +117,7 @@ export default function Login() {
             variant="outlined"
             size="small"
             sx={{ mb: 2.5 }}
+            onChange={(e) => setEmail(e.target.value)}
           />
 
           <Typography sx={{ mb: 1, fontWeight: 500 }}>Password</Typography>
@@ -79,6 +128,7 @@ export default function Login() {
             variant="outlined"
             size="small"
             sx={{ mb: 1 }}
+            onChange={(e) => setPassword(e.target.value)}
           />
 
           <Box
@@ -126,6 +176,8 @@ export default function Login() {
                 backgroundColor: "#3e0e0e",
               },
             }}
+
+            onClick={loginHandler}
           >
             Login
           </Button>
