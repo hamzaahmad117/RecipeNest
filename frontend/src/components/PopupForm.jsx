@@ -1,4 +1,3 @@
-// import React, { useState } from 'react';
 import {
   Modal,
   Box,
@@ -11,6 +10,7 @@ import {
   Slider,
 } from "@mui/material";
 import { useState } from "react";
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -26,89 +26,118 @@ const style = {
   overflowY: "auto",
 };
 
-export default function PopupForm(props) {
-  // const [open, setOpen] = useState(false);
-  // const handleOpen = () => setOpen(true);
-  // const handleClose = () => setOpen(false);
-  const [selectedOption, setSelectedOption] = useState();
+export default function PopupForm({ open, onClose, chefEmail }) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [cookingTime, setCookingTime] = useState(30);
+  const [cuisine, setCuisine] = useState("");
+  const [instructions, setInstructions] = useState("");
+  const [imageUrl, setImageUrl] = useState(""); // Assuming user pastes a link for now
 
-  const handleChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleSliderChange = (event, newValue) => {
-    setCookingTime(newValue);
+    const recipeData = {
+      name,
+      description,
+      time: `${cookingTime} minutes`,
+      cuisine,
+      cookingInstructions: instructions
+      .split("\n")
+      .map(instr => instr.trim())
+      .filter(instr => instr.length > 0),
+      avatar: imageUrl,
+    };
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/chefs/${chefEmail}/recipes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(recipeData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Recipe added successfully!");
+        onClose(); // close modal
+      } else {
+        alert(data.error || "Failed to add recipe");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while submitting");
+    }
   };
 
   return (
-    <>
-      <Modal open={props.open} onClose={props.onClose}>
-        <Box sx={style}>
-          <Typography variant="h6" mb={2}>
-            Add Your Recipe
-          </Typography>
-          <form>
-            <TextField
-              fullWidth
-              label="Name of dish"
-              name="name of dish"
-              margin="normal"
+    <Modal open={open} onClose={onClose}>
+      <Box sx={style}>
+        <Typography variant="h6" mb={2}>
+          Add Your Recipe
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            fullWidth
+            label="Name of dish"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Description of dish"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            margin="normal"
+          />
+          <Box mt={2} mb={2}>
+            <Typography gutterBottom>Cooking Time (in minutes)</Typography>
+            <Slider
+              value={cookingTime}
+              onChange={(e, newVal) => setCookingTime(newVal)}
+              step={5}
+              marks
+              min={10}
+              max={120}
+              valueLabelDisplay="auto"
             />
-            <TextField
-              fullWidth
-              label="Description of dish"
-              name="description"
-              margin="normal"
-            />
-            <Box mt={2} mb={2}>
-              <Typography gutterBottom>Cooking Time (in minutes)</Typography>
-              <Slider
-                value={cookingTime}
-                onChange={handleSliderChange}
-                step={5}
-                marks
-                min={10}
-                max={120}
-                valueLabelDisplay="auto"
-              />
-            </Box>
-            <InputLabel id="dropdown-label">Select the Cuisine</InputLabel>
-            <Select
-              labelId="dropdown-label"
-              value={selectedOption}
-              onChange={handleChange}
-              label="Options"
-              fullWidth
-              margin="normal"
-            >
-              <MenuItem value="desi">Desi</MenuItem>
-              <MenuItem value="italian">Italian</MenuItem>
-              <MenuItem value="British">British</MenuItem>
-            </Select>
-            <TextField
-              fullWidth
-              label="Cooking Instructions"
-              name="cooking instructions"
-              margin="normal"
-              multiline
-              rows={4}
-            />
-            <Box mt={2} mb={2}>
-              <Typography gutterBottom>
-                Upload a Picture of Your Dish
-              </Typography>
-              <Button variant="outlined" component="label" fullWidth>
-                Upload File
-                <input type="file" hidden accept="image/*" />
-              </Button>
-            </Box>
-            <Button variant="contained" type="submit" fullWidth sx={{ mt: 2 }}>
-              Submit
-            </Button>
-          </form>
-        </Box>
-      </Modal>
-    </>
+          </Box>
+          <InputLabel id="dropdown-label">Select the Cuisine</InputLabel>
+          <Select
+            labelId="dropdown-label"
+            value={cuisine}
+            onChange={(e) => setCuisine(e.target.value)}
+            fullWidth
+            margin="normal"
+          >
+            <MenuItem value="Desi">Desi</MenuItem>
+            <MenuItem value="Western">Western</MenuItem>
+            <MenuItem value="British">British</MenuItem>
+          </Select>
+          <TextField
+            fullWidth
+            label="Cooking Instructions (one step per line)"
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            margin="normal"
+            multiline
+            rows={4}
+          />
+          <TextField
+            fullWidth
+            label="Image URL"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            margin="normal"
+          />
+          <Button variant="contained" type="submit" fullWidth sx={{ mt: 2 }}>
+            Submit
+          </Button>
+        </form>
+      </Box>
+    </Modal>
   );
 }

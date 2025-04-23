@@ -1,18 +1,11 @@
 import * as React from "react";
 import Card from "@mui/material/Card";
-
 import CardContent from "@mui/material/CardContent";
-
 import Typography from "@mui/material/Typography";
 import { Avatar, Box } from "@mui/material";
 import RoundedBtn from "./RoundedBtn";
-import { useNavigate } from "react-router-dom";
 
 export default function ChefCard({ name, description, avatar, btnText, onClick }) {
-
-
-
-
   return (
     <Card
       sx={{
@@ -20,6 +13,12 @@ export default function ChefCard({ name, description, avatar, btnText, onClick }
         p: 2,
         borderRadius: "16px",
         boxShadow: 3,
+        height: 350,
+        width: 300,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        mx: "auto",
       }}
     >
       <Avatar
@@ -31,13 +30,25 @@ export default function ChefCard({ name, description, avatar, btnText, onClick }
         <Typography variant="h6" fontWeight="bold">
           {name}
         </Typography>
-        <Typography variant="body2" color="text.secondary" mt={1}>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          mt={1}
+          sx={{
+            maxHeight: 60,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+          }}
+        >
           {description}
         </Typography>
-        <Box sx={{ mt: 2 }}>
-          <RoundedBtn text={btnText} onClick={onClick}/>
-        </Box>
       </CardContent>
+      <Box sx={{ mt: 2 }}>
+        <RoundedBtn text={btnText} onClick={onClick} />
+      </Box>
     </Card>
   );
 }

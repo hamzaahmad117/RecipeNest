@@ -27,6 +27,7 @@ export default function Profile() {
 
     const fetchRecipes = async () => {
       try {
+        console.log(chefData.email);
         const response = await fetch(`http://localhost:5000/api/chefs/${chefData.email}/recipes`);
         if (!response.ok) throw new Error("Failed to fetch recipes");
         const data = await response.json();
@@ -60,8 +61,8 @@ export default function Profile() {
       <PopupRecipe open={open} onClose={() => setOpen(false)} data={jsonData} />
       <Bio
         name={chef.firstName + " " + chef.lastName}
-        description={chef.Description}
-        avatar={chef.avatar}
+        description={chef.description}
+        avatar={chef.avatar === '' ? "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png" : chef.avatar}
         twitter={chef.twitter}
       />
       <Box sx={{ display: "flex", justifyContent: "center" }}>

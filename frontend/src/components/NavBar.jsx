@@ -7,11 +7,12 @@ import RoundedBtn from "./RoundedBtn";
 import { useNavigate } from "react-router-dom";
 
 export default function NavBar() {
-  const buttons = ["Home", "Chefs", "Recipes", "Login"];
   const navigate = useNavigate();
+  const chef = localStorage.getItem("chef");
+
+  const buttons = ["Home", "Chefs", "Recipes", chef ? "Logout" : "Login"];
 
   const handleClick = (btn) => {
-    console.log(btn);
     if (btn === "Home") {
       navigate("/");
     } else if (btn === "Chefs") {
@@ -20,49 +21,49 @@ export default function NavBar() {
       navigate("/ExploreRecipes");
     } else if (btn === "Login") {
       navigate("/login");
+    } else if (btn === "Logout") {
+      localStorage.removeItem("chef");
+      navigate("/login"); // or navigate to home if you prefer
     }
   };
 
   const handleRoundBtnClick = () => {
     navigate("/Signup");
   };
+
   return (
-    // <Box sx={{ flexGrow: 1 }}>
     <AppBar position="static">
       <Toolbar
         sx={{ backgroundColor: "#FBFBFB", justifyContent: "space-between" }}
       >
-        {/* Left Button */}
-        <img
-          src="https://m.media-amazon.com/images/I/51hNRqIg+eL.png"
-          alt="logo"
-          style={{
-            width: "40px",
-            // height: '40px',
-            borderRadius: "50%",
-            objectFit: "cover",
-            paddingRight: "10px",
-          }}
-        />
-        <Typography
-          variant="h6"
-          noWrap
-          component="a"
-          href="#app-bar-with-responsive-menu"
-          sx={{
-            mr: 2,
-            display: { xs: "none", md: "flex" },
-            fontFamily: "sans-serif",
-            fontWeight: 700,
-            //    letterSpacing: '.3rem',
-            color: "#030303",
-            textDecoration: "none",
-          }}
-        >
-          Recipe Nest
-        </Typography>
+        {/* Logo & Title */}
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <img
+            src="https://m.media-amazon.com/images/I/51hNRqIg+eL.png"
+            alt="logo"
+            style={{
+              width: "40px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              paddingRight: "10px",
+            }}
+          />
+          <Typography
+            variant="h6"
+            noWrap
+            component="a"
+            href="#"
+            sx={{
+              fontWeight: 700,
+              color: "#030303",
+              textDecoration: "none",
+            }}
+          >
+            Recipe Nest
+          </Typography>
+        </Box>
 
-        {/* Center Buttons */}
+        {/* Nav Buttons */}
         <Box
           sx={{
             display: "flex",
@@ -75,21 +76,17 @@ export default function NavBar() {
             <Button
               key={btn}
               sx={{ color: "#88304E", textTransform: "none" }}
-              onClick={() => {
-                handleClick(btn);
-              }}
+              onClick={() => handleClick(btn)}
             >
               {btn}
             </Button>
           ))}
-          {/* <Button sx={{color: '#88304E'}}></Button> */}
         </Box>
 
-        {/* Right Button */}
-        <RoundedBtn
-          text="Join as a Chef"
-          onClick={handleRoundBtnClick}
-        ></RoundedBtn>
+        {/* Join as a Chef Button (only if not logged in) */}
+        {!chef && (
+          <RoundedBtn text="Join as a Chef" onClick={handleRoundBtnClick} />
+        )}
       </Toolbar>
     </AppBar>
   );

@@ -9,8 +9,68 @@ import {
   Link,
   Divider,
 } from "@mui/material";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    agree: false,
+  });
+
+  const [error, setError] = useState("");
+
+  const handleChange = (field) => (e) => {
+    const value = field === "agree" ? e.target.checked : e.target.value;
+    setFormData({ ...formData, [field]: value });
+  };
+
+  const handleSignup = async () => {
+    setError("");
+
+    if (!formData.agree) {
+      setError("You must agree to the Terms & Conditions.");
+      return;
+    }
+    const { firstName, lastName, email, password} = formData;
+    if (!firstName || !lastName || !email || !password) {
+      setError("Please fill all required fields and agree to terms.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/chefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          password: formData.password,
+          avatar: "", // Optional
+          description: "", // Optional
+          twitter: "", // Optional
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Signup failed");
+      }
+
+      localStorage.setItem("chef", JSON.stringify(data.chef));
+      navigate("/"); // Redirect anywhere after signup
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <Grid container sx={{ height: "100vh" }}>
       <Grid
@@ -26,19 +86,10 @@ export default function Signup() {
         }}
       >
         <Box sx={{ width: "80%", maxWidth: 400 }}>
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            gutterBottom
-            sx={{ color: "#333" }}
-          >
+          <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ color: "#333" }}>
             Create an Account
           </Typography>
-          <Typography
-            variant="body1"
-            gutterBottom
-            sx={{ color: "#666", mb: 3 }}
-          >
+          <Typography variant="body1" gutterBottom sx={{ color: "#666", mb: 3 }}>
             Join our chef community
           </Typography>
 
@@ -50,59 +101,33 @@ export default function Signup() {
             <Divider sx={{ flexGrow: 1 }} />
           </Box>
 
-          <Typography sx={{ mb: 1, fontWeight: 500 }}>Full Name</Typography>
-          <TextField
-            fullWidth
-            placeholder="Enter your Full Name"
-            variant="outlined"
-            size="small"
-            sx={{ mb: 2.5 }}
-          />
-
-          <Typography sx={{ mb: 1, fontWeight: 500 }}>Email</Typography>
-          <TextField
-            fullWidth
-            placeholder="Enter your mail"
-            variant="outlined"
-            size="small"
-            sx={{ mb: 2.5 }}
-          />
-
-          <Typography sx={{ mb: 1, fontWeight: 500 }}>Phone Number</Typography>
-          <TextField
-            fullWidth
-            placeholder="Enter your Phone number"
-            variant="outlined"
-            size="small"
-            sx={{ mb: 2.5 }}
-          />
-
-          <Typography sx={{ mb: 1, fontWeight: 500 }}>Password</Typography>
-          <TextField
-            fullWidth
-            placeholder="Enter password"
-            type="password"
-            variant="outlined"
-            size="small"
-            sx={{ mb: 2.5 }}
-          />
-
-          <Typography sx={{ mb: 1, fontWeight: 500 }}>
-            Confirm Password
-          </Typography>
-          <TextField
-            fullWidth
-            placeholder="Confirm Password"
-            type="password"
-            variant="outlined"
-            size="small"
-            sx={{ mb: 2 }}
-          />
+          {["firstName", "lastName", "email", "password"].map((field) => (
+            <Box key={field} sx={{ mb: 2.5 }}>
+              <Typography sx={{ mb: 1, fontWeight: 500 }}>
+                {field === "firstName"
+                  ? "First Name"
+                  : field === "lastName"
+                  ? "Last Name"
+                  : field.charAt(0).toUpperCase() + field.slice(1)}
+              </Typography>
+              <TextField
+                fullWidth
+                placeholder={`Enter your ${field === "firstName" ? "first name" : field === "lastName" ? "last name" : field}`}
+                variant="outlined"
+                type={field === "password" ? "password" : "text"}
+                size="small"
+                value={formData[field]}
+                onChange={handleChange(field)}
+              />
+            </Box>
+          ))}
 
           <FormControlLabel
             control={
               <Checkbox
                 size="small"
+                checked={formData.agree}
+                onChange={handleChange("agree")}
                 sx={{
                   color: "#541212",
                   "&.Mui-checked": {
@@ -111,13 +136,15 @@ export default function Signup() {
                 }}
               />
             }
-            label={
-              <Box sx={{ fontSize: "0.875rem" }}>
-                I agree to the Terms & Conditions
-              </Box>
-            }
+            label={<Box sx={{ fontSize: "0.875rem" }}>I agree to the Terms & Conditions</Box>}
             sx={{ mb: 2 }}
           />
+
+          {error && (
+            <Typography sx={{ color: "red", fontSize: "0.875rem", mb: 2 }}>
+              {error}
+            </Typography>
+          )}
 
           <Button
             fullWidth
@@ -132,6 +159,7 @@ export default function Signup() {
                 backgroundColor: "#3e0e0e",
               },
             }}
+            onClick={handleSignup}
           >
             Create Account
           </Button>
@@ -141,7 +169,7 @@ export default function Signup() {
               Already have an account?{" "}
             </Typography>
             <Link
-              href="#"
+              href="/login"
               underline="none"
               sx={{ color: "#7A1E1E", fontWeight: 500, fontSize: "0.875rem" }}
             >
