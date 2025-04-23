@@ -90,6 +90,8 @@ const handleProfileUpdate = (newData) => {
         open={open2}
         onClose={() => setOpen2(false)}
         data={jsonData}
+        chefEmail={chefData.email}
+        edit={true}
       />
       <Box
         sx={{
@@ -209,7 +211,7 @@ const handleProfileUpdate = (newData) => {
         {/* <PopupForm></PopupForm> */}
 
         {/* Edit recipe button */}
-        <Button 
+        {/* <Button 
           variant="contained"
           sx={{
             display: "flex",
@@ -237,7 +239,7 @@ const handleProfileUpdate = (newData) => {
             }}
           />
           <Typography fontWeight="medium">Edit Recipe</Typography>
-        </Button>
+        </Button> */}
         
 
 
@@ -320,12 +322,14 @@ const handleProfileUpdate = (newData) => {
         justifyContent="center"
       >
         <ChefCard
+        id={recipe.id}
           name={recipe.name}
           description={recipe.description}
           avatar={recipe.avatar}
           btnText={"View Recipe"}
           onClick={() => {
             clickHandler2({
+              id: recipe.id,
               name: recipe.name,
               description: recipe.description,
               time: recipe.time,

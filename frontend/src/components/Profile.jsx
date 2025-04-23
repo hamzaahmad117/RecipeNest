@@ -58,7 +58,7 @@ export default function Profile() {
 
   return (
     <>
-      <PopupRecipe open={open} onClose={() => setOpen(false)} data={jsonData} />
+      <PopupRecipe open={open} onClose={() => setOpen(false)} data={jsonData} edit={false}/>
       <Bio
         name={chef.firstName + " " + chef.lastName}
         description={chef.description}

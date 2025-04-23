@@ -5,7 +5,7 @@ import Typography from "@mui/material/Typography";
 import { Avatar, Box } from "@mui/material";
 import RoundedBtn from "./RoundedBtn";
 
-export default function ChefCard({ name, description, avatar, btnText, onClick }) {
+export default function ChefCard({ id, name, description, avatar, btnText, onClick }) {
   return (
     <Card
       sx={{

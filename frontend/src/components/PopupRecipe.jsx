@@ -1,6 +1,7 @@
-// import React, { useState } from 'react';
 import { Modal, Box, Typography, Button } from "@mui/material";
-//import { useState } from "react";
+import { useState } from "react";
+import EditRecipeForm from "./EditRecipeForm"; // adjust path
+
 const style = {
   position: "absolute",
   top: "50%",
@@ -17,18 +18,15 @@ const style = {
 };
 
 export default function PopupRecipe(props) {
-  //const [open, setOpen] = useState(props.open);
-  //   const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    //setOpen(false);
-    // if (props.onClose) {
-    props.onClose();
-    // }
-  };
+  const handleClose = () => props.onClose();
+  const [editOpen, setEditOpen] = useState(false);
+  //console.log(props.data);
+  console.log(props.chefEmail);
+
 
   return (
     <>
-      <Modal open={props.open} onClose={props.onClose}>
+      <Modal open={props.open} onClose={handleClose}>
         <Box sx={style}>
           <Typography variant="h6" mb={2}>
             {props.data.name} Recipe
@@ -56,8 +54,20 @@ export default function PopupRecipe(props) {
           <Button variant="contained" onClick={handleClose} fullWidth>
             Close
           </Button>
+          {props.edit ? (<Button variant="contained" onClick={() => setEditOpen(true)} fullWidth sx={{ mt: 1 }}>
+            Edit
+          </Button>) : null}
+          
         </Box>
       </Modal>
+
+      {/* Edit Modal */}
+      <EditRecipeForm
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        chefEmail={props.chefEmail}
+        recipe={props.data}
+      />
     </>
   );
 }

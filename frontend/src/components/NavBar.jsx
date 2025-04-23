@@ -10,20 +10,37 @@ export default function NavBar() {
   const navigate = useNavigate();
   const chef = localStorage.getItem("chef");
 
-  const buttons = ["Home", "Chefs", "Recipes", chef ? "Logout" : "Login"];
+  // Set buttons based on login state
+  const buttons = chef
+    ? ["Home", "Profile", "Edit Profile", "Chefs", "Recipes", "Logout"]
+    : ["Home", "Chefs", "Recipes", "Login"];
 
   const handleClick = (btn) => {
-    if (btn === "Home") {
-      navigate("/");
-    } else if (btn === "Chefs") {
-      navigate("/ourchefs");
-    } else if (btn === "Recipes") {
-      navigate("/ExploreRecipes");
-    } else if (btn === "Login") {
-      navigate("/login");
-    } else if (btn === "Logout") {
-      localStorage.removeItem("chef");
-      navigate("/login"); // or navigate to home if you prefer
+    switch (btn) {
+      case "Home":
+        navigate("/");
+        break;
+      case "Profile":
+        navigate("/profile");
+        break;
+      case "Edit Profile":
+        navigate("/ChefProfile");
+        break;
+      case "Chefs":
+        navigate("/ourchefs");
+        break;
+      case "Recipes":
+        navigate("/ExploreRecipes");
+        break;
+      case "Login":
+        navigate("/login");
+        break;
+      case "Logout":
+        localStorage.removeItem("chef");
+        navigate("/login");
+        break;
+      default:
+        break;
     }
   };
 

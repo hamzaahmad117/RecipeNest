@@ -113,6 +113,8 @@ router.get('/:email/recipes', async (req, res) => {
       .map(doc => ({ id: doc.id, ...doc.data() }));
 
     res.json(recipes);
+
+    // console.log('Fetched recipes:', recipes);
   } catch (error) {
     console.error('Error fetching recipes:', error);
     res.status(500).json({ error: 'Failed to fetch recipes' });
@@ -173,6 +175,86 @@ router.post('/:email/recipes', async (req, res) => {
     res.status(500).json({ error: 'Failed to add recipe' });
   }
 });
+
+
+// router.put('/:email/recipes', async (req, res) => {
+//   const { email } = req.params;
+//   const updatedRecipe = req.body;
+
+//   if (!updatedRecipe || !updatedRecipe.name) {
+//     return res.status(400).json({ error: 'Recipe name and content are required.' });
+//   }
+
+//   try {
+//     const userRef = db.collection('chefs').doc(email);
+//     const doc = await userRef.get();
+
+//     if (!doc.exists) {
+//       return res.status(404).json({ error: 'Chef not found.' });
+//     }
+
+//     const chefData = doc.data();
+//     const recipes = chefData.recipes || [];
+
+//     const recipeIndex = recipes.findIndex(r => r.id === updatedRecipe.id);
+
+//     if (recipeIndex === -1) {
+//       return res.status(404).json({ error: 'Recipe not found.' });
+//     }
+
+//     recipes[recipeIndex] = updatedRecipe;
+
+//     await userRef.update({ recipes });
+
+//     res.json({ message: 'Recipe updated successfully.', recipes });
+//   } catch (err) {
+//     console.error('Error updating recipe:', err);
+//     res.status(500).json({ error: 'Internal server error.' });
+//   }
+// });
+
+router.put('/:email/recipes/:recipeId', async (req, res) => {
+  const { email, recipeId } = req.params;
+  const updatedRecipe = req.body;
+
+  if (!updatedRecipe || !updatedRecipe.name) {
+    return res.status(400).json({ error: 'Recipe data is incomplete.' });
+  }
+
+  console.log(email)
+  try {
+    const chefRef = db.collection('chefs').doc(email);
+    const chefDoc = await chefRef.get();
+
+    if (!chefDoc.exists) {
+      return res.status(404).json({ error: 'Chef not found.' });
+    }
+
+    const chefData = chefDoc.data();
+    const recipeIds = chefData.recipeRefs || [];
+    // console.log(recipeIds);
+    // console.log(recipeId);
+
+    if (!recipeIds.includes(recipeId)) {
+      return res.status(404).json({ error: 'Recipe not associated with this chef.' });
+    }
+
+    const recipeRef = db.collection('recipes').doc(recipeId);
+    const recipeDoc = await recipeRef.get();
+
+    if (!recipeDoc.exists) {
+      return res.status(404).json({ error: 'Recipe not found in recipes collection.' });
+    }
+
+    await recipeRef.update(updatedRecipe);
+
+    res.json({ message: 'Recipe updated successfully.', updatedRecipe });
+  } catch (err) {
+    console.error('Error updating recipe:', err);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 
 
 export default router;
