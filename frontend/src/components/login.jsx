@@ -187,7 +187,7 @@ export default function Login() {
               Not Registered Yet?
             </Typography>
             <Link
-              href="#"
+              href="/Signup"
               underline="none"
               sx={{ color: "#7A1E1E", fontWeight: 500, fontSize: "0.875rem" }}
             >
