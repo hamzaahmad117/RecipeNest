@@ -4,8 +4,6 @@ import dotenv from 'dotenv';
 import chefRoutes from './routes/chef.route.js'
 
 
-
-
 dotenv.config();
 
 const app = express();
