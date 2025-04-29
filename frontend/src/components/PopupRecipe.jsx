@@ -1,6 +1,11 @@
-import { Modal, Box, Typography, Button } from "@mui/material";
+import {
+  Modal,
+  Box,
+  Typography,
+  Button,
+} from "@mui/material";
 import { useState } from "react";
-import EditRecipeForm from "./EditRecipeForm"; // adjust path
+import EditRecipeForm from "./EditRecipeForm";
 
 const style = {
   position: "absolute",
@@ -20,9 +25,29 @@ const style = {
 export default function PopupRecipe(props) {
   const handleClose = () => props.onClose();
   const [editOpen, setEditOpen] = useState(false);
-  //console.log(props.data);
-  console.log(props.chefEmail);
 
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this recipe?")) return;
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/chefs/${props.chefEmail}/recipes/${props.data.id}`, {
+        method: "DELETE",
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        alert("Recipe deleted successfully!");
+        props.onClose(); // close the modal
+        if (props.onDelete) props.onDelete(); // trigger refresh if parent passed a callback
+      } else {
+        alert(result.error || "Failed to delete recipe");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting recipe");
+    }
+  };
 
   return (
     <>
@@ -51,17 +76,35 @@ export default function PopupRecipe(props) {
               ))}
             </ol>
           </Typography>
+
           <Button variant="contained" onClick={handleClose} fullWidth>
             Close
           </Button>
-          {props.edit ? (<Button variant="contained" onClick={() => setEditOpen(true)} fullWidth sx={{ mt: 1 }}>
-            Edit
-          </Button>) : null}
-          
+
+          {props.edit && (
+            <>
+              <Button
+                variant="contained"
+                onClick={() => setEditOpen(true)}
+                fullWidth
+                sx={{ mt: 1 }}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleDelete}
+                fullWidth
+                sx={{ mt: 1 }}
+              >
+                Delete
+              </Button>
+            </>
+          )}
         </Box>
       </Modal>
 
-      {/* Edit Modal */}
       <EditRecipeForm
         open={editOpen}
         onClose={() => setEditOpen(false)}

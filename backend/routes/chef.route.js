@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    console.log('Fetching chefs...');
+    // console.log('Fetching chefs...');
     const chefsRef = db.collection('chefs');
     const snapshot = await chefsRef.get();
 
@@ -174,6 +174,28 @@ router.post('/:email/recipes', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to add recipe' });
+  }
+});
+
+
+// DELETE /api/chefs/:email/recipes/:recipeId
+router.delete('/:email/recipes/:recipeId', async (req, res) => {
+  try {
+    const { email, recipeId } = req.params;
+
+    // 1. Remove the recipe document from the central collection
+    await db.collection('recipes').doc(recipeId).delete();
+
+    // 2. Remove recipe ID reference from the chef document
+    const chefRef = db.collection('chefs').doc(email);
+    await chefRef.update({
+      recipeRefs: admin.firestore.FieldValue.arrayRemove(recipeId),
+    });
+
+    res.status(200).json({ message: 'Recipe deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete recipe' });
   }
 });
 
