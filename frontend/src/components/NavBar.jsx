@@ -24,7 +24,7 @@ export default function NavBar() {
         navigate("/profile");
         break;
       case "Edit Profile":
-        navigate("/ChefProfile");
+        navigate("/MyProfile");
         break;
       case "Chefs":
         navigate("/ourchefs");

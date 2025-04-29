@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
+    console.log('Fetching chefs...');
     const chefsRef = db.collection('chefs');
     const snapshot = await chefsRef.get();
 

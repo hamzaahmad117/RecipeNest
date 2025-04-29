@@ -1,46 +1,62 @@
+import { useState, useEffect } from "react";
 import {
   Box,
   Typography,
   TextField,
   InputAdornment,
   Grid,
+  Pagination,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ChefCard from "./ChefCard";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 export default function MeetOurChefs() {
+  const navigate = useNavigate();
+  const [chefs, setChefs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const chefsPerPage = 4; // number of chefs per page
 
-    const navigate = useNavigate();
-    const handleClick = (chef) => {
+  useEffect(() => {
+    const fetchChefs = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/chefs");
+        setChefs(response.data);
+      } catch (error) {
+        console.error("Error fetching chefs:", error);
+      }
+    };
 
-    console.log(chef)
-    navigate('/Profile')
+    fetchChefs();
+  }, []);
 
-  }
+  const handleChefClick = (chef) => {
+    navigate("/chef-profile", { state: { chef } });
+  };
 
-  const chefs = [
-    {
-      name: "Daniel Fernandez",
-      description:
-        "A passionate baker specializing in artisan bread and French pastries.",
-      avatar:
-        "https://media.istockphoto.com/id/1388253782/photo/positive-successful-millennial-business-professional-man-head-shot-portrait.jpg?s=612x612&w=0&k=20&c=uS4knmZ88zNA_OjNaE_JCRuq9qn3ycgtHKDKdJSnGdY=",
-    },
-    {
-      name: "Emily Carter",
-      description:
-        "Master of fusion cuisine, blending Latin flavors with modern twists.",
-      avatar:
-        "https://static.vecteezy.com/system/resources/thumbnails/038/962/461/small/ai-generated-caucasian-successful-confident-young-businesswoman-ceo-boss-bank-employee-worker-manager-with-arms-crossed-in-formal-wear-isolated-in-white-background-photo.jpg",
-    },
-    {
-      name: "Aysha Williams",
-      description:
-        "Loves to bring South Asian spices to life with unique homemade recipes.",
-      avatar:
-        "https://media.istockphoto.com/id/1437816897/photo/business-woman-manager-or-human-resources-portrait-for-career-success-company-we-are-hiring.jpg?s=612x612&w=0&k=20&c=tyLvtzutRh22j9GqSGI33Z4HpIwv9vL_MZw_xOE19NQ=",
-    },
-  ];
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // reset page on search
+  };
+
+  const filteredChefs = chefs.filter((chef) =>
+    `${chef.firstName} ${chef.lastName}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase())
+  );
+
+  const indexOfLastChef = currentPage * chefsPerPage;
+  const indexOfFirstChef = indexOfLastChef - chefsPerPage;
+  const currentChefs = filteredChefs.slice(indexOfFirstChef, indexOfLastChef);
+
+  const totalPages = Math.ceil(filteredChefs.length / chefsPerPage);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   return (
     <>
       {/* bg image */}
@@ -65,42 +81,70 @@ export default function MeetOurChefs() {
           Meet Our Chefs
         </Typography>
       </Box>
+
       {/* search bar */}
       <Box sx={{ display: "flex", justifyContent: "center", mt: -3 }}>
-        <TextField
+      <TextField
           placeholder="Search for a chef..."
           variant="outlined"
+          value={searchQuery}
+          onChange={handleSearchChange}
           sx={{
             width: "60%",
-            backgroundColor: "white",
             borderRadius: 5,
             boxShadow: 1,
-          }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
+            backgroundColor: "white",
+            mt: 2,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 5,
+              "& fieldset": {
+                border: "none", // removes the weird default outline
+              },
+              "&:hover fieldset": {
+                border: "none", // no border on hover
+              },
+              "&.Mui-focused fieldset": {
+                border: "none", // no border on focus
+              },
             },
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
           }}
         />
       </Box>
+
+      {/* chefs grid */}
       <Box sx={{ px: 4, py: 6 }}>
         <Grid container spacing={4} justifyContent="center">
-          {chefs.map((chef, index) => (
+          {currentChefs.map((chef, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <ChefCard
-                name={chef.name}
+                name={`${chef.firstName} ${chef.lastName}`}
                 description={chef.description}
                 avatar={chef.avatar}
                 btnText="View Profile"
-                onClick = {() => handleClick(chef.name)}
+                onClick={() => handleChefClick(chef)}
               />
             </Grid>
           ))}
         </Grid>
+
+        {/* pagination */}
+        {totalPages > 1 && (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+            />
+          </Box>
+        )}
       </Box>
     </>
   );

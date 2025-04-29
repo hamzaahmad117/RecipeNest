@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import chefRoutes from './routes/chef.route.js'
+import recipeRoutes from './routes/recipe.route.js';
 
 
 dotenv.config();
@@ -18,6 +19,7 @@ app.use(cors())
 
 
 app.use("/api/chefs", chefRoutes)
+app.use("/api/recipes", recipeRoutes)
 
 
 // Start the server
